@@ -1,14 +1,19 @@
 import axios from 'axios';
 import { NextRequest, NextResponse } from 'next/server';
 
+interface Product {
+  id: string;
+  quantity: number;
+}
+
 export async function POST(req: NextRequest) {
-  const { cart } = await req.json();
+  const { cart }: { cart: Product[] } = await req.json();
 
   try {
     const response = await axios.post('https://dev.sellix.io/orders', {
-      products: cart.map((product: any) => ({
+      products: cart.map((product: Product) => ({
         id: product.id,
-        quantity: 1, // Assuming 1 for simplicity, adjust as needed
+        quantity: product.quantity, // Assuming 1 for simplicity, adjust as needed
       })),
     }, {
       headers: {
@@ -18,6 +23,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ url: response.data.data.url });
   } catch (error) {
+    console.error('Error placing order:', error);
     return NextResponse.json({ error: 'Payment processing failed' }, { status: 500 });
   }
 }
