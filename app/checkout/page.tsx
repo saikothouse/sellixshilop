@@ -1,9 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import Image from "next/image";
-import { FaTrash, FaArrowRight } from 'react-icons/fa';
+import { useRouter } from 'next/navigation';
 
 interface Product {
   id: string;
@@ -12,23 +11,42 @@ interface Product {
   image_url: string;
 }
 
-export default function CartPage() {
+export default function CheckoutPage() {
   const [cart, setCart] = useState<Product[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
     setCart(storedCart);
   }, []);
 
-  const removeFromCart = (id: string) => {
-    const updatedCart = cart.filter((product) => product.id !== id);
-    setCart(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
+  const placeOrder = async () => {
+    try {
+      const response = await fetch('/api/payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ cart }),
+      });
+
+      const result = await response.json();
+      if (result.url) {
+        router.push(result.url);
+      } else {
+        alert('Payment processing failed');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error placing order');
+    }
   };
+
+  const totalPrice = cart.reduce((total, product) => total + product.price, 0);
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">Your Cart</h1>
+      <h1 className="text-2xl font-bold mb-6">Checkout</h1>
       {cart.length === 0 ? (
         <p>Your cart is empty.</p>
       ) : (
@@ -40,23 +58,16 @@ export default function CartPage() {
                 <h2 className="text-lg font-bold">{product.title}</h2>
                 <p className="text-indigo-600 font-bold">${product.price}</p>
               </div>
-              <button
-                onClick={() => removeFromCart(product.id)}
-                className="bg-red-600 text-white px-4 py-2 rounded-lg flex items-center"
-              >
-                <FaTrash className="mr-1" /> Remove
-              </button>
             </div>
           ))}
-        </div>
-      )}
-      {cart.length > 0 && (
-        <div className="mt-6 flex justify-end">
-          <Link href="/checkout">
-            <a className="bg-indigo-600 text-white px-4 py-2 rounded-lg flex items-center">
-              <FaArrowRight className="mr-1" /> Proceed to Checkout
-            </a>
-          </Link>
+          <div className="mt-6 flex justify-end">
+            <h2 className="text-xl font-bold">Total: ${totalPrice}</h2>
+          </div>
+          <div className="mt-6 flex justify-end">
+            <button onClick={placeOrder} className="bg-indigo-600 text-white px-4 py-2 rounded-lg">
+              Place Order
+            </button>
+          </div>
         </div>
       )}
     </div>
