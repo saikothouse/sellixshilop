@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FaShoppingCart, FaHome, FaTwitter, FaFacebook, FaInstagram } from 'react-icons/fa';
+import './globals.css'; // Importing global CSS here
 
 export default function RootLayout({
   children,
