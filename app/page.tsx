@@ -23,6 +23,7 @@ export default function HomePage() {
             Authorization: `Bearer ${process.env.NEXT_PUBLIC_SELLIX_API_KEY}`,
           },
         });
+        console.log('Fetched products:', data);
         setProducts(data.data.products);
       } catch (error) {
         console.error('Error fetching products:', error);
