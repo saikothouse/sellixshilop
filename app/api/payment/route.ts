@@ -1,18 +1,23 @@
 import axios from 'axios';
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextRequest, NextResponse } from 'next/server';
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const orderData = req.body;
+export async function POST(req: NextRequest) {
+  const { cart } = await req.json();
 
   try {
-    const { data } = await axios.post('https://dev.sellix.io/orders', orderData, {
+    const response = await axios.post('https://dev.sellix.io/orders', {
+      products: cart.map((product: any) => ({
+        id: product.id,
+        quantity: 1, // Assuming 1 for simplicity, adjust as needed
+      })),
+    }, {
       headers: {
         Authorization: `Bearer ${process.env.NEXT_PUBLIC_SELLIX_API_KEY}`,
       },
     });
 
-    res.status(200).json(data);
+    return NextResponse.json({ url: response.data.data.url });
   } catch (error) {
-    res.status(500).json({ error: 'Payment processing failed' });
+    return NextResponse.json({ error: 'Payment processing failed' }, { status: 500 });
   }
-};
+}
