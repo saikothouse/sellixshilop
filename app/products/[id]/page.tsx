@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import axios from 'axios';
 
 interface Product {
@@ -11,14 +12,15 @@ interface Product {
   image_url: string;
 }
 
-const ProductPage = ({ params }: { params: { id: string } }) => {
+const ProductPage = () => {
+  const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
   const [cart, setCart] = useState<Product[]>([]);
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const { data } = await axios.get(`https://dev.sellix.io/products/${params.id}`, {
+        const { data } = await axios.get(`https://dev.sellix.io/products/${id}`, {
           headers: {
             Authorization: `Bearer ${process.env.NEXT_PUBLIC_SELLIX_API_KEY}`,
           },
@@ -32,7 +34,7 @@ const ProductPage = ({ params }: { params: { id: string } }) => {
     fetchProduct();
     const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
     setCart(storedCart);
-  }, [params.id]);
+  }, [id]);
 
   const addToCart = () => {
     if (product) {
