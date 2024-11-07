@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
 import axios from 'axios';
 
 interface Product {
@@ -15,8 +14,7 @@ interface Product {
 const ProductPage = ({ params }: { params: { id: string } }) => {
   const [product, setProduct] = useState<Product | null>(null);
   const [cart, setCart] = useState<Product[]>([]);
-  const router = useRouter();
-  
+
   useEffect(() => {
     const fetchProduct = async () => {
       try {
