@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import Image from "next/image";
 import axios from 'axios';
 
 interface Product {
