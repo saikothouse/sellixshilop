@@ -4,13 +4,6 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FaShoppingCart, FaHome, FaTwitter, FaFacebook, FaInstagram } from 'react-icons/fa';
 
-interface Product {
-  id: string;
-  title: string;
-  price: number;
-  image_url: string;
-}
-
 export default function RootLayout({
   children,
 }: {
@@ -19,8 +12,8 @@ export default function RootLayout({
   const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
-    const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
-    setCartCount(storedCart.length);
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    setCartCount(cart.length);
   }, []);
 
   return (
@@ -38,13 +31,8 @@ export default function RootLayout({
                 <a className="mr-4 hover:underline">Products</a>
               </Link>
               <Link href="/cart">
-                <a className="hover:underline flex items-center relative">
-                  <FaShoppingCart className="mr-1" /> Cart
-                  {cartCount > 0 && (
-                    <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1 ml-2 absolute top-0 right-0">
-                      {cartCount}
-                    </span>
-                  )}
+                <a className="hover:underline flex items-center">
+                  <FaShoppingCart className="mr-1" /> Cart ({cartCount})
                 </a>
               </Link>
             </div>
