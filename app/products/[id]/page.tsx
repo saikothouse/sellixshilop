@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import axios from 'axios';
-import Image from "next/image";
 
 interface Product {
   id: string;
@@ -12,33 +12,39 @@ interface Product {
   image_url: string;
 }
 
-export async function getServerSideProps({ params }: { params: { id: string } }) {
-  const { data } = await axios.get(`https://dev.sellix.io/products/${params.id}`, {
-    headers: {
-      Authorization: `Bearer ${process.env.NEXT_PUBLIC_SELLIX_API_KEY}`,
-    },
-  });
-
-  return {
-    props: {
-      product: data.data.product,
-    },
-  };
-}
-
-const ProductPage = ({ product }: { product: Product }) => {
+const ProductPage = ({ params }: { params: { id: string } }) => {
+  const [product, setProduct] = useState<Product | null>(null);
   const [cart, setCart] = useState<Product[]>([]);
-
+  const router = useRouter();
+  
   useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const { data } = await axios.get(`https://dev.sellix.io/products/${params.id}`, {
+          headers: {
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_SELLIX_API_KEY}`,
+          },
+        });
+        setProduct(data.data.product);
+      } catch (error) {
+        console.error('Error fetching product:', error);
+      }
+    };
+
+    fetchProduct();
     const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
     setCart(storedCart);
-  }, []);
+  }, [params.id]);
 
   const addToCart = () => {
-    const updatedCart = [...cart, product];
-    setCart(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
+    if (product) {
+      const updatedCart = [...cart, product];
+      setCart(updatedCart);
+      localStorage.setItem('cart', JSON.stringify(updatedCart));
+    }
   };
+
+  if (!product) return <div>Loading...</div>;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
