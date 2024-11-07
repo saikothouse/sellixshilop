@@ -1,5 +1,8 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect } from 'react';
 import axios from 'axios';
+import Image from "next/image";
 import { FaInfoCircle, FaShoppingBag } from 'react-icons/fa';
 
 interface Product {
@@ -10,21 +13,26 @@ interface Product {
   image_url: string;
 }
 
-export async function getServerSideProps() {
-  const { data } = await axios.get('https://dev.sellix.io/products', {
-    headers: {
-      Authorization: `Bearer ${process.env.NEXT_PUBLIC_SELLIX_API_KEY}`,
-    },
-  });
+export default function HomePage() {
+  const [products, setProducts] = useState<Product[]>([]);
 
-  return {
-    props: {
-      products: data.data.products,
-    },
-  };
-}
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const { data } = await axios.get('https://dev.sellix.io/products', {
+          headers: {
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_SELLIX_API_KEY}`,
+          },
+        });
+        setProducts(data.data.products);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
 
-export default function HomePage({ products }: { products: Product[] }) {
+    fetchProducts();
+  }, []);
+
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-2xl font-bold mb-6">Our Products</h1>
