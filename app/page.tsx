@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import Image from "next/image";
 import { FaInfoCircle, FaShoppingBag } from 'react-icons/fa';
+import Image from "next/image";
 
 interface Product {
   id: string;
