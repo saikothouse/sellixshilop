@@ -1,24 +1,52 @@
-import './globals.css';
+'use client';
+
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { FaShoppingCart, FaHome, FaTwitter, FaFacebook, FaInstagram } from 'react-icons/fa';
+
+interface Product {
+  id: string;
+  title: string;
+  price: number;
+  image_url: string;
+}
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    setCartCount(storedCart.length);
+  }, []);
+
   return (
     <html lang="en">
       <body className="bg-gray-100">
         <nav className="bg-indigo-600 text-white p-4">
           <div className="container mx-auto flex justify-between items-center">
-            <a href="/" className="text-xl font-bold flex items-center">
-              <FaHome className="mr-2" /> My Shop
-            </a>
-            <div>
-              <a href="/products" className="mr-4 hover:underline">Products</a>
-              <a href="/cart" className="hover:underline flex items-center">
-                <FaShoppingCart className="mr-1" /> Cart
+            <Link href="/">
+              <a className="text-xl font-bold flex items-center">
+                <FaHome className="mr-2" /> My Shop
               </a>
+            </Link>
+            <div className="flex items-center">
+              <Link href="/products">
+                <a className="mr-4 hover:underline">Products</a>
+              </Link>
+              <Link href="/cart">
+                <a className="hover:underline flex items-center relative">
+                  <FaShoppingCart className="mr-1" /> Cart
+                  {cartCount > 0 && (
+                    <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1 ml-2 absolute top-0 right-0">
+                      {cartCount}
+                    </span>
+                  )}
+                </a>
+              </Link>
             </div>
           </div>
         </nav>
